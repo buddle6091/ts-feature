@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import axios from "axios";
 import styled from "styled-components";
 
 interface caro {
@@ -47,38 +48,62 @@ const caroArray: Array<caro> = [
 /* const leftRef = useRef();
 const rightRef = useRef(); */
 
+/* const [currentIdx, setCurrentIdx] = useState(0); */
+
 function Carousel() {
+  useEffect(() => {
+    async function a() {
+      const res = await axios.get(
+        "https://apis.data.go.kr/B551011/GoCamping/basedList?MobileOS=ETC&MobileApp=gocamp&serviceKey=hxdpEFH4tR8PQCTY8sfFyV78s69uVxnI1z7AJkIgBlkk2kHb0WxnFqZjaLQ9sbfo%2B5C7c47t74J1aNmioNNrwg%3D%3D&_type=json"
+      );
+      console.log(res);
+    }
+    a();
+  }, []);
+
   return (
-    <div className="box-border">
-      <CarouselBox>
-        <CarouselInline>
-          {caroArray.map((x, i) => (
-            <div key={x.ImgUrl}>
-              <CarouselImg src={x?.ImgUrl} alt={x?.ImgUrl} />
-            </div>
-          ))}
-        </CarouselInline>
-      </CarouselBox>
-      <button id="left"> 왼 </button>
-      <button id="right"> 오 </button>
-    </div>
+    <CarouselBox>
+      <CarouselUl>
+        {caroArray.map((x, i) => (
+          <CarouselLi key={x.ImgUrl}>
+            <CarouselImg src={x?.ImgUrl} alt={x?.ImgUrl} />
+          </CarouselLi>
+        ))}
+      </CarouselUl>
+    </CarouselBox>
   );
 }
 
 export default Carousel;
 
 const CarouselBox = styled.div`
-  width: 500px;
+  width: 100%;
   height: 300px;
+  display: flex;
   overflow: hidden;
 `;
 
-const CarouselInline = styled.div`
-  display: inline-block;
+const CarouselUl = styled.ul`
+  width: 500px;
+  height: 300px;
+  display: flex;
+  position: relative;
+`;
+
+const CarouselLi = styled.li`
+  list-style: none;
+  width: 500px;
+  height: 300px;
+  display: flex;
+  position: relative;
+  overflow: hidden;
 `;
 
 const CarouselImg = styled.img`
-  width: 500px;
+  width: 300px;
   height: 300px;
+  padding-left: 10px;
+  border-radius: 1px solid;
+  object-fit: contain;
   flex: none;
 `;
