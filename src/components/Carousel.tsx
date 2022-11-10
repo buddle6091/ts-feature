@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, MouseEvent } from "react";
 import axios from "axios";
 import styled from "styled-components";
+import DragEvent from "../utils/DragEvent";
 
 interface caro {
   ImgUrl: string;
@@ -29,6 +30,9 @@ const caroArray: Array<caro> = [
   },
 ];
 
+const SLIDER_WIDTH = 400;
+const SLIDER_HEIGHT = 400;
+
 /* 해당 Carousel item의 현재 index */
 
 function Carousel() {
@@ -45,42 +49,18 @@ function Carousel() {
 
   /* 현재 캐로셀 아이템의 인덱스 값 */
   const [currentIdx, setCurrentIdx] = useState(0);
+  /* x축의 변하는 값 */
+  const [transX, setTransX] = useState(0);
+  /* transition */
+  const [isAni, setIsAni] = useState(false);
 
-  /* 자동 슬라이드 기능  --> 일단 보류 */
-  /* const autoSlide = (callback, delay) => {
-    const itemRef = useRef();
-    useEffect(() => {
-      itemRef.current = callback;
-    }, [callback]);
+  const slideList = [caroArray.at(-1), ...caroArray, caroArray.at(0)];
 
-    useEffect(() => {
-      const ex = () => {
-        itemRef.current()
-      }
-      if (delay !== null) {
-        let id = setInterval(ex, delay);
-        return () => clearInterval(id);
-      }
-    }, [delay])
-  } */
-
-  /* 해당 Carousel item 이 잘 찍혔는지 확인 */
-  /*   const handleClick =
-    (currentIdx: number) => (event: MouseEvent<HTMLElement>) => {
-      console.log(currentIdx + "event target is : ", event);
-    };
-
-  const cycler = (cycle: number) => (num: number) => {
-    ((num % cycle) + cycle) % cycle;
-  }; */
-
-  /* 왼쪽으로 넘기기 */
-  /*   const swipeLeft = () => {
-    setCurrentIdx((cur) => cycler())
-  }
- */
-
-  /* 오른쪽으로 넘기기 */
+  const inrange = (cur: number, min: number, max: number) => {
+    if (cur > max) return max;
+    if (cur < min) return min;
+    return cur;
+  };
 
   return (
     <CarouselViewer>
@@ -88,10 +68,38 @@ function Carousel() {
       Carousel item을 왼쪽으로 옮겨 숨겨진 item을 오른쪽에서 가져와야되기 때문에 left로 가기 위해 음수의 값을 가져야 됨 
       Carousel은 item 개수 만큼의 width을 가진다. 하나의 슬라이드 = total Carousel width / items.length*/}
       <CarouselSlider
+        /* Carousel Item 넘겼을 때  */
         style={{
           transform: `translateX(${
             (-100 / caroArray.length) * (0.5 + currentIdx)
           }%)`,
+          transition: `transform ${isAni ? 300 : 0}ms ease-in-out 0s`,
+        }}
+        /* DragEvent util 사용 */
+        {...DragEvent({
+          onDragChange: (deltaX) => {
+            setTransX(inrange(deltaX, -SLIDER_WIDTH + 10, SLIDER_WIDTH + 10));
+          },
+          onDragEnd: (deltaX) => {
+            const maxIndex = slideList.length - 1;
+
+            if (deltaX < -100)
+              setCurrentIdx(inrange(currentIdx + 1, 0, maxIndex));
+            if (deltaX > 100)
+              setCurrentIdx(inrange(currentIdx - 1, 0, maxIndex));
+
+            setIsAni(true);
+            setTransX(0);
+          },
+        })}
+        onTransitionEnd={() => {
+          setIsAni(false);
+
+          if (currentIdx === 0) {
+            setCurrentIdx(slideList.length - 2);
+          } else if (currentIdx === slideList.length - 1) {
+            setCurrentIdx(1);
+          }
         }}>
         {caroArray.map((x) => (
           <CarouselSlide key={x.ImgUrl}>
@@ -106,9 +114,10 @@ function Carousel() {
 export default Carousel;
 
 const CarouselViewer = styled.div`
-  width: 600px;
+  width: 800px;
   height: 400px;
   overflow: hidden;
+  user
 `;
 
 const CarouselSlider = styled.div`

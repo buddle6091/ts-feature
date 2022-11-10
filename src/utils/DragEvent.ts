@@ -7,7 +7,6 @@ mousedown - touchdown, mousemove - touchmove, mouseup - touchend
 */
 
 import React from "react";
-import { getDefaultFormatCodeSettings } from "typescript";
 
 /* window.matchMedia : 미디어쿼리를 이용하여 접속하는 웹브라우저의 가로크기에 따른 반응형 작업이 가능 */
 const isTouchWindow =
@@ -21,6 +20,7 @@ function DragEvent({
 }: {
   onDragChange?: (deltaX: number, deltaY: number) => void;
   onDragEnd?: (deltaX: number, deltaY: number) => void;
+
   stopPropagation?: boolean;
 }) {
   /* 모바일 환경에서 touch로 작동할 때 move -> touch*/
@@ -38,6 +38,9 @@ function DragEvent({
             moveEvent.touches[0].pageY - touchEvent.touches[0].pageY;
           onDragChange?.(deltaX, deltaY);
         };
+        document.addEventListener("touchmove", touchMoveHandler, {
+          passive: false,
+        });
 
         const touchEndHandler = (moveEvent: TouchEvent) => {
           if (moveEvent.cancelable) moveEvent.preventDefault();

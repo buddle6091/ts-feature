@@ -1,12 +1,13 @@
 import React from "react";
 import Carousel from "./components/Carousel";
-import logo from "./logo.svg";
+import Search from "./components/Search";
 import "./App.css";
 
 function App() {
   return (
     <div className="App">
       <header className="App-header">
+        <Search />
         <Carousel />
       </header>
     </div>
