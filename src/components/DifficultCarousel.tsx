@@ -35,7 +35,7 @@ const SLIDER_HEIGHT = 400;
 
 /* 해당 Carousel item의 현재 index */
 
-function Carousel() {
+function DifficultCarousel() {
   /* goCamp API 출력 확인 */
   useEffect(() => {
     async function a() {
@@ -121,7 +121,7 @@ function Carousel() {
   );
 }
 
-export default Carousel;
+export default DifficultCarousel;
 
 const CarouselViewer = styled.div`
   width: 800px;
